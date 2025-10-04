@@ -108,46 +108,24 @@ const observer = new IntersectionObserver((entries) => {
   })
 }, observerOptions)
 
-// Observe elements for animation (excluindo cards do carrossel)
-document.querySelectorAll(".servico-card, .portfolio-item, .stat-item").forEach((el) => {
+// Observe elements for animation
+document.querySelectorAll(".servico-card, .portfolio-item, .depoimento-card, .stat-item").forEach((el) => {
   el.style.opacity = "0"
   el.style.transform = "translateY(30px)"
   el.style.transition = "opacity 0.6s ease, transform 0.6s ease"
   observer.observe(el)
 })
 
-// Animação especial para a seção de depoimentos
-const depoimentosSection = document.querySelector(".depoimentos")
-if (depoimentosSection) {
-  depoimentosSection.style.opacity = "0"
-  depoimentosSection.style.transform = "translateY(20px)"
-  depoimentosSection.style.transition = "opacity 0.8s ease, transform 0.8s ease"
-  observer.observe(depoimentosSection)
-}
-
-// Garantir que os cards do carrossel permaneçam visíveis
-document.querySelectorAll(".depoimento-card").forEach((el) => {
-  el.style.opacity = "1"
-  el.style.transform = "translateY(0)"
-})
-
 // Carrossel Infinito de Depoimentos
 function initTestimonialsCarousel() {
   const carousel = document.getElementById("depoimentosCarousel")
-  if (!carousel) return
-  
   const cards = carousel.querySelectorAll(".depoimento-card")
-  if (cards.length === 0) return
 
   // Clone cards for infinite scroll
   cards.forEach((card) => {
     const clone = card.cloneNode(true)
     carousel.appendChild(clone)
   })
-
-  // Garantir visibilidade do carrossel
-  carousel.style.opacity = "1"
-  carousel.style.visibility = "visible"
 
   // Pause animation on hover
   carousel.addEventListener("mouseenter", () => {
@@ -185,8 +163,8 @@ contatoForm.addEventListener("submit", function (e) {
     return
   }
 
-  // Create WhatsApp message
-  const whatsappMessage = `Olá! Gostaria de saber mais sobre o serviço💜
+  // Create WhatsApp message - EMOJI CORRIGIDO
+  const whatsappMessage = `Ola! Gostaria de saber mais sobre o servico
 
 *Nome:* ${nome}
 *E-mail:* ${email}
@@ -354,6 +332,16 @@ style.textContent = `
     .notification {
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
+    
+    .blink {
+        animation: blink 0.5s step-start infinite;
+    }
+    
+    @keyframes blink {
+        50% {
+            opacity: 0;
+        }
+    }
 `
 document.head.appendChild(style)
 
@@ -420,3 +408,37 @@ const debouncedScrollHandler = debounce(() => {
 }, 10)
 
 window.addEventListener("scroll", debouncedScrollHandler)
+
+// ===== EFEITO DE PISCAR DO OLHO =====
+function initEyeBlinkEffect() {
+  const logos = document.querySelectorAll(".logo-img")
+
+  function makeEyeBlink() {
+    logos.forEach((logo) => {
+      logo.classList.add("blink")
+      setTimeout(() => {
+        logo.classList.remove("blink")
+      }, 600) // Duração da animação
+    })
+  }
+
+  // Piscar a cada 4-6 segundos (aleatório para parecer mais natural)
+  function scheduleNextBlink() {
+    const randomDelay = Math.random() * 2000 + 4000 // Entre 4-6 segundos
+    setTimeout(() => {
+      makeEyeBlink()
+      scheduleNextBlink() // Agendar próxima piscada
+    }, randomDelay)
+  }
+
+  // Iniciar o ciclo de piscadas
+  scheduleNextBlink()
+
+  // Piscar quando passar o mouse sobre a logo
+  logos.forEach((logo) => {
+    logo.addEventListener("mouseenter", makeEyeBlink)
+  })
+}
+
+// Inicializar o efeito quando a página carregar
+document.addEventListener("DOMContentLoaded", initEyeBlinkEffect)
