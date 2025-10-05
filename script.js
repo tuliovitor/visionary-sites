@@ -410,16 +410,28 @@ const debouncedScrollHandler = debounce(() => {
 window.addEventListener("scroll", debouncedScrollHandler)
 
 // ===== EFEITO DE PISCAR DO OLHO =====
+let isBlinking = false // Flag para controlar se está piscando
+
 function initEyeBlinkEffect() {
   const logos = document.querySelectorAll(".logo-img")
 
   function makeEyeBlink() {
+    // Prevenir múltiplas animações simultâneas
+    if (isBlinking) return
+
+    isBlinking = true
+
     logos.forEach((logo) => {
       logo.classList.add("blink")
-      setTimeout(() => {
-        logo.classList.remove("blink")
-      }, 600) // Duração da animação
     })
+
+    // Remover a classe após a animação completa
+    setTimeout(() => {
+      logos.forEach((logo) => {
+        logo.classList.remove("blink")
+      })
+      isBlinking = false
+    }, 600)
   }
 
   // Piscar a cada 4-6 segundos (aleatório para parecer mais natural)
@@ -434,9 +446,20 @@ function initEyeBlinkEffect() {
   // Iniciar o ciclo de piscadas
   scheduleNextBlink()
 
-  // Piscar quando passar o mouse sobre a logo
+  // Piscar quando passar o mouse sobre a logo (com debounce)
+  let hoverTimeout
   logos.forEach((logo) => {
-    logo.addEventListener("mouseenter", makeEyeBlink)
+    logo.addEventListener("mouseenter", () => {
+      clearTimeout(hoverTimeout)
+      hoverTimeout = setTimeout(() => {
+        makeEyeBlink()
+      }, 100) // Pequeno delay para evitar triggers acidentais
+    })
+
+    // Limpar o timeout se o mouse sair antes
+    logo.addEventListener("mouseleave", () => {
+      clearTimeout(hoverTimeout)
+    })
   })
 }
 
